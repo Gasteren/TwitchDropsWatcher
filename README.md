@@ -23,4 +23,4 @@
 
 ## 🛠️ How to Install
 
-Download from ![Curseforge](https://Curseforge.com/wow/addons/twitch-drops-watcher)
+Download from [Curseforge](https://Curseforge.com/wow/addons/twitch-drops-watcher)
