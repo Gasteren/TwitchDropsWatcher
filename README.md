@@ -15,10 +15,12 @@
 
 ## 📸 Preview
 
-*https://img.irosec.com/jVQhcs2av80Wuk.png*
+![Twitch Drops Watcher Preview](./images/main.png)
+![Options Menu](./images/options.png)
+![Minimap Icon](./images/minimap.png)
 
 ---
 
 ## 🛠️ How to Install
 
-Download from Curseforge: 
+Download from ![Curseforge](https://Curseforge.com/wow/addons/twitch-drops-watcher)
