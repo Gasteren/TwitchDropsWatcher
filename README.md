@@ -15,9 +15,9 @@
 
 ## 📸 Preview
 
-![Twitch Drops Watcher Preview]https://raw.githubusercontent.com/Gasteren/TwitchDropsWatcher/master/images/main.png
-![Options Menu]https://raw.githubusercontent.com/Gasteren/TwitchDropsWatcher/master/images/options.png
-![Minimap Icon]https://raw.githubusercontent.com/Gasteren/TwitchDropsWatcher/master/images/minimap.png
+![Twitch Drops Watcher Preview](https://raw.githubusercontent.com/Gasteren/TwitchDropsWatcher/master/images/main.png)
+![Options Menu](https://raw.githubusercontent.com/Gasteren/TwitchDropsWatcher/master/images/options.png)
+![Minimap Icon](https://raw.githubusercontent.com/Gasteren/TwitchDropsWatcher/master/images/minimap.png)
 
 ---
 
