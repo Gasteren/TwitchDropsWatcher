@@ -2,10 +2,10 @@
 ## Title: Twitch Drops Watcher
 ## Notes: Tracks Twitch Drops and promotions for World of Warcraft: The War Within.
 ## Author: Frost-Norgannon
-## Version: 11.1.7
+## Version: 11.1.7.1
 ## SavedVariables: TwitchDropsWatcherDB
 
-# Libraries | Some libs were added ahead of their time no hate plz
+# Libraries
 libs\LibStub\LibStub.lua
 libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
 libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
@@ -15,8 +15,9 @@ libs\AceEvent-3.0\AceEvent-3.0.lua
 libs\AceConsole-3.0\AceConsole-3.0.lua
 libs\AceDB-3.0\AceDB-3.0.lua
 libs\AceGUI-3.0\AceGUI-3.0.lua
-libs\AceConfig-3.0\AceConfig-3.0.lua
 libs\AceConfigRegistry-3.0\AceConfigRegistry-3.0.lua
+libs\AceConfigCmd-3.0\AceConfigCmd-3.0.lua
+libs\AceConfig-3.0\AceConfig-3.0.lua
 libs\AceConfigDialog-3.0\AceConfigDialog-3.0.lua
 libs\LibSharedMedia-3.0\LibSharedMedia-3.0.lua
 

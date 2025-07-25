@@ -1,28 +1,45 @@
+print("Loading TwitchDropsWatcher Core.lua") -- Debug print to confirm loading
+
 TwitchDropsWatcher = TwitchDropsWatcher or {}
 
 -- Initialize Ace3 addon
 local addonName = "TwitchDropsWatcher"
-local addon = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceEvent-3.0")
-local AceConfig = LibStub("AceConfig-3.0")
-local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+local addon = LibStub and LibStub("AceAddon-3.0", true) and LibStub("AceAddon-3.0"):NewAddon(addonName, "AceEvent-3.0")
+if not addon then
+    print("|cffFF0000TwitchDropsWatcher Error:|r AceAddon-3.0 not found! Addon disabled.")
+    return
+end
+
+local AceConfig = LibStub and LibStub("AceConfig-3.0", true)
+local AceConfigDialog = LibStub and LibStub("AceConfigDialog-3.0", true)
 
 -- Initialize addon
 function addon:OnInitialize()
+    print("TwitchDropsWatcher: OnInitialize called") -- Debug print
     -- Load saved variables
     TwitchDropsWatcherDB = TwitchDropsWatcherDB or {
         notifyOnLogin = true,
         playSound = true,
-        autoOpenUI = true,
+        autoOpenUI = false,
     }
 
-    -- Register settings with AceConfig (only once)
-    if not AceConfigDialog.BlizOptions[addonName] then
-        AceConfig:RegisterOptionsTable(addonName, TwitchDropsWatcher.options)
-        AceConfigDialog:AddToBlizOptions(addonName, "Twitch Drops Watcher")
+    -- Register settings with AceConfig
+    if AceConfig and AceConfigDialog and TwitchDropsWatcher.options and TwitchDropsWatcher.options.type == "group" and TwitchDropsWatcher.options.args then
+        if not AceConfigDialog.BlizOptions[addonName] then
+            local success, err = pcall(function()
+                AceConfig:RegisterOptionsTable(addonName, TwitchDropsWatcher.options)
+                AceConfigDialog:AddToBlizOptions(addonName, "Twitch Drops Watcher")
+            end)
+            if not success then
+                print("|cffFF0000TwitchDropsWatcher Error:|r Failed to register options: " .. tostring(err))
+            end
+        end
+    else
+        print("|cffFF0000TwitchDropsWatcher Warning:|r AceConfig, AceConfigDialog, or valid options table not found! Settings disabled.")
     end
 
     -- Update campaign status
-    if TwitchDropsWatcher.Data then
+    if TwitchDropsWatcher.Data and TwitchDropsWatcher.Data.UpdateCampaignStatus then
         TwitchDropsWatcher.Data:UpdateCampaignStatus()
     else
         print("|cffFF0000TwitchDropsWatcher Error:|r Data module not loaded!")
@@ -34,7 +51,7 @@ function addon:OnInitialize()
         self:CreateMinimapButton()
     else
         print("|cffFF0000TwitchDropsWatcher Error:|r LibDataBroker-1.1 not found! Minimap button disabled.")
-    end -- should always be found because libdatabroker is stored locally
+    end
 
     -- Register events
     self:RegisterEvent("PLAYER_LOGIN", "CheckForActiveCampaigns")
@@ -56,7 +73,11 @@ function addon:CreateMinimapButton()
         end,
     })
 
-    LibStub("LibDBIcon-1.0"):Register("TwitchDropsWatcher", ldb, TwitchDropsWatcherDB)
+    if LibStub and LibStub:GetLibrary("LibDBIcon-1.0", true) then
+        LibStub("LibDBIcon-1.0"):Register("TwitchDropsWatcher", ldb, TwitchDropsWatcherDB)
+    else
+        print("|cffFF0000TwitchDropsWatcher Error:|r LibDBIcon-1.0 not found! Minimap button disabled.")
+    end
 end
 
 -- Check for active campaigns and notify
@@ -64,9 +85,11 @@ function addon:CheckForActiveCampaigns()
     if not TwitchDropsWatcherDB.notifyOnLogin then return end
 
     local activeCampaigns = {}
-    for _, campaign in ipairs(TwitchDropsWatcher.Data.Campaigns) do
-        if campaign.isActive then
-            table.insert(activeCampaigns, campaign)
+    if TwitchDropsWatcher.Data and TwitchDropsWatcher.Data.Campaigns then
+        for _, campaign in ipairs(TwitchDropsWatcher.Data.Campaigns) do
+            if campaign.isActive then
+                table.insert(activeCampaigns, campaign)
+            end
         end
     end
 

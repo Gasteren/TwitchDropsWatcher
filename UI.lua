@@ -1,10 +1,12 @@
+print("Loading TwitchDropsWatcher UI.lua") -- Debug print to confirm loading
+
 TwitchDropsWatcher = TwitchDropsWatcher or {}
-TwitchDropsWatcher.UI = {}
+TwitchDropsWatcher.UI = TwitchDropsWatcher.UI or {}
 
 -- Create main frame
 function TwitchDropsWatcher.UI:Create()
     local frame = CreateFrame("Frame", "TwitchDropsWatcherFrame", UIParent, "BasicFrameTemplateWithInset")
-    frame:SetSize(450, 350) -- Increased size for better layout
+    frame:SetSize(500, 400)
     frame:SetPoint("CENTER")
     frame:SetMovable(true)
     frame:EnableMouse(true)
@@ -15,7 +17,7 @@ function TwitchDropsWatcher.UI:Create()
 
     -- Title
     frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
-    frame.title:SetPoint("TOP", 0, -4)
+    frame.title:SetPoint("TOP", 0, -5)
     frame.title:SetText("|cff00ff00Twitch Drops Watcher|r")
 
     -- Scroll frame for campaign list
@@ -24,7 +26,7 @@ function TwitchDropsWatcher.UI:Create()
     scrollFrame:SetPoint("BOTTOMRIGHT", -30, 10)
 
     local content = CreateFrame("Frame", "TwitchDropsWatcherContent", scrollFrame)
-    content:SetSize(410, 300)
+    content:SetSize(460, 350)
     scrollFrame:SetScrollChild(content)
 
     -- Store content frame for updating
@@ -71,9 +73,11 @@ function TwitchDropsWatcher.UI:Update()
 
     -- Filter active campaigns
     local activeCampaigns = {}
-    for _, campaign in ipairs(TwitchDropsWatcher.Data.Campaigns) do
-        if campaign.isActive then
-            table.insert(activeCampaigns, campaign)
+    if TwitchDropsWatcher.Data and TwitchDropsWatcher.Data.Campaigns then
+        for _, campaign in ipairs(TwitchDropsWatcher.Data.Campaigns) do
+            if campaign.isActive then
+                table.insert(activeCampaigns, campaign)
+            end
         end
     end
 
@@ -89,55 +93,83 @@ function TwitchDropsWatcher.UI:Update()
     -- Populate active campaigns
     local lastButton
     for i, campaign in ipairs(activeCampaigns) do
-        local button = CreateFrame("Button", nil, content)
-        button:SetSize(390, 70)
-        button:SetPoint("TOPLEFT", 0, -((i-1)*80))
+        local button = CreateFrame("Frame", nil, content)
+        button:SetSize(440, 110)
+        button:SetPoint("TOPLEFT", 0, -((i-1)*120))
 
-        -- Highlight for interactivity
-        button:SetHighlightTexture("Interface\\Buttons\\UI-Panel-Button-Highlight")
-        button:GetHighlightTexture():SetBlendMode("ADD")
-
-        -- Icon
-        local icon = button:CreateTexture(nil, "ARTWORK")
+        -- Icon (as a button for Ctrl+Left-Click)
+        local iconButton = CreateFrame("Button", nil, button)
+        iconButton:SetSize(40, 40)
+        iconButton:SetPoint("LEFT", 10, 0)
+        local icon = iconButton:CreateTexture(nil, "ARTWORK")
         icon:SetSize(40, 40)
-        icon:SetPoint("LEFT", 10, 0)
-        icon:SetTexture(campaign.icon or "Interface\\Icons\\INV_Misc_QuestionMark") -- Fallback icon
+        icon:SetPoint("CENTER")
+        icon:SetTexture(campaign.icon or "Interface\\Icons\\INV_Misc_QuestionMark")
+        icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+        -- Add white square outline
+        local border = iconButton:CreateTexture(nil, "BORDER")
+        border:SetTexture("Interface\\Buttons\\WHITE8X8")
+        border:SetPoint("TOPLEFT", -3, 3) -- Adjusted to move outline further out
+        border:SetPoint("BOTTOMRIGHT", 3, -3) -- Adjusted to move outline further out
+        border:SetVertexColor(1, 1, 1, 0.8) -- White with slight transparency
+        -- Ctrl+Left-Click to open Dressing Room
+        if campaign.itemID then
+            iconButton:SetScript("OnClick", function(self, clickButton, down)
+                if clickButton == "LeftButton" and IsControlKeyDown() then
+                    local itemLink = "|Hitem:" .. campaign.itemID .. "|h[" .. campaign.reward .. "]|h"
+                    DressUpItemLink(itemLink)
+                end
+            end)
+        end
 
-        -- Campaign text
-        local text = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        text:SetPoint("LEFT", icon, "RIGHT", 10, 0)
-        text:SetJustifyH("LEFT")
-        text:SetWidth(200)
-        text:SetText(string.format("|cff00ff00%s|r\nReward: %s\n%s",
-            campaign.name,
-            campaign.reward,
-            campaign.requirement))
+        -- Indicator for Ctrl+Left-Click
+        local clickIndicator = button:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        clickIndicator:SetPoint("TOPLEFT", iconButton, "TOPRIGHT", 10, -5)
+        clickIndicator:SetJustifyH("LEFT")
+        clickIndicator:SetTextColor(0.8, 0.8, 0.8)
+        clickIndicator:SetText("Ctrl+Click to preview")
 
-        -- Countdown timer
-        local timerText = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        timerText:SetPoint("RIGHT", -10, 0)
+        -- Campaign name (prominent)
+        local nameText = button:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+        nameText:SetPoint("TOPLEFT", iconButton, "TOPRIGHT", 10, -20)
+        nameText:SetJustifyH("LEFT")
+        nameText:SetWidth(250)
+        nameText:SetTextColor(0, 1, 0)
+        nameText:SetText(campaign.name)
+
+        -- Reward
+        local rewardText = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        rewardText:SetPoint("TOPLEFT", nameText, "BOTTOMLEFT", 0, -5)
+        rewardText:SetJustifyH("LEFT")
+        rewardText:SetWidth(250)
+        rewardText:SetText("Reward: " .. campaign.reward)
+
+        -- Requirement (stand out)
+        local reqText = button:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        reqText:SetPoint("TOPLEFT", rewardText, "BOTTOMLEFT", 0, -5)
+        reqText:SetJustifyH("LEFT")
+        reqText:SetWidth(250)
+        reqText:SetTextColor(1, 0.5, 0)
+        reqText:SetText("Req: " .. campaign.requirement)
+
+        -- Countdown timer (stand out)
+        local timerText = button:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
+        timerText:SetPoint("TOPRIGHT", -10, -10)
         timerText:SetJustifyH("RIGHT")
         button.timerText = timerText
         button.endTime = TwitchDropsWatcher.Data:ParseDate(campaign.endDate)
-
-        -- -- Click to open link - http request do not really work? wow client wont let you click links ingame?
-        -- button:SetScript("OnClick", function()
-        --     StaticPopupDialogs["TWITCHDROPSWATCHER_LINK"] = {
-        --         text = "Open Twitch link for this campaign?",
-        --         button1 = "Yes",
-        --         button2 = "No",
-        --         OnAccept = function() ShowTwitchLink(campaign.link) end,
-        --         timeout = 0,
-        --         whileDead = true,
-        --         hideOnEscape = true
-        --     }
-        --     StaticPopup_Show("TWITCHDROPSWATCHER_LINK")
-        -- end)
+        local secondsLeft = button.endTime - time()
+        timerText:SetText("Ends in: " .. FormatTimeRemaining(secondsLeft))
+        if secondsLeft < 3600 then
+            timerText:SetTextColor(1, 0, 0)
+        else
+            timerText:SetTextColor(1, 1, 0)
+        end
 
         lastButton = button
     end
 
-    content:SetHeight(#activeCampaigns * 80)
+    content:SetHeight(#activeCampaigns * 120)
 end
 
 -- Update countdown timers
@@ -148,6 +180,28 @@ function TwitchDropsWatcher.UI:UpdateTimers(frame, elapsed)
         if button.timerText and button.endTime then
             local secondsLeft = button.endTime - currentTime
             button.timerText:SetText("Ends in: " .. FormatTimeRemaining(secondsLeft))
+            if secondsLeft < 3600 then
+                button.timerText:SetTextColor(1, 0, 0)
+            else
+                button.timerText:SetTextColor(1, 1, 0)
+            end
+        end
+    end
+end
+
+-- Safety check on frame creation
+function TwitchDropsWatcher.UI:UpdateTimers(frame, elapsed)
+    if not frame:IsShown() or not frame.content then return end
+    local currentTime = time()
+    for _, button in ipairs({frame.content:GetChildren()}) do
+        if button.timerText and button.endTime then
+            local secondsLeft = button.endTime - currentTime
+            button.timerText:SetText("Ends in: " .. FormatTimeRemaining(secondsLeft))
+            if secondsLeft < 3600 then
+                button.timerText:SetTextColor(1, 0, 0)
+            else
+                button.timerText:SetTextColor(1, 1, 0)
+            end
         end
     end
 end
