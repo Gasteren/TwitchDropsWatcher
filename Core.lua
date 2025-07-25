@@ -2,7 +2,7 @@ print("Loading TwitchDropsWatcher Core.lua") -- Debug print to confirm loading
 
 TwitchDropsWatcher = TwitchDropsWatcher or {}
 
--- Initialize Ace3 addon
+-- Initialize Ace3 addon and more
 local addonName = "TwitchDropsWatcher"
 local addon = LibStub and LibStub("AceAddon-3.0", true) and LibStub("AceAddon-3.0"):NewAddon(addonName, "AceEvent-3.0")
 if not addon then
