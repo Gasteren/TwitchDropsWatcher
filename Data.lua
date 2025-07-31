@@ -9,23 +9,23 @@ TwitchDropsWatcher.Data.Campaigns = {
         name = "Patch 11.1.7 - Adorned Half Shell",
         reward = "Adorned Half Shell",
         requirement = "Watch 4 hours of WoW streams",
-        startDate = "2025-07-14 17:00 UTC",
-        endDate   = "2025-08-11 16:59 UTC",
+        startDate = "2025-07-14 10:00 PDT",
+        endDate = "2025-08-11 10:00 PDT",
         link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
         icon = "Interface\\Icons\\inv_cape_special_turtleshell_c_03",
         itemID = 235987, -- itemid for ctrl click
         isActive = true,
     },
     {
-        name = "Watcher of the Huntress",
-        reward = "Watcher of the Huntress",
-        requirement = "Watch 2 hours of WoW streams",
-        startDate = "2025-06-02 10:00 PDT",
-        endDate = "2025-06-30 10:00 PDT",
+        name = "11.2 - Shadefur Brewthief Pet",
+        reward = "Shadefur Brewthief Pet",
+        requirement = "Watch 4 hours of WoW streams",
+        startDate = "2025-08-05 10:00 PDT",
+        endDate = "2025-09-02 10:00 PDT",
         link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
-        icon = "Interface\\Icons\\INV_Misc_QuestionMark",
-        itemID = 123457, -- itemid for ctrl click
-        isActive = false,
+        icon = "Interface\\Icons\\inv_redpandapet_violet",
+        itemID = 246451, -- itemid for ctrl click
+        isActive = true,
     },
 }
 
