@@ -1,8 +1,10 @@
 ## Interface: 110107, 110200
 ## Title: Twitch Drops Watcher
 ## Notes: Tracks Twitch Drops and promotions for World of Warcraft: The War Within.
-## Author: Frost-Norgannon
 ## Version: 11.2
+## Author: Frost-Lightbringer
+## Group: Tools by: Frostaphim | Frost-Lightbringer
+
 ## SavedVariables: TwitchDropsWatcherDB
 
 # Libraries
