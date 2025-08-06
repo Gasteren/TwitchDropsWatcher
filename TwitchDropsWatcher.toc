@@ -5,6 +5,8 @@
 ## Author: Frost-Lightbringer
 ## Group: Tools by: Frostaphim | Frost-Lightbringer
 
+## IconTexture: Interface\ICONS\inv_eyeofnzothpet
+
 ## SavedVariables: TwitchDropsWatcherDB
 
 # Libraries
