@@ -6,6 +6,17 @@ TwitchDropsWatcher.Data = TwitchDropsWatcher.Data or {}
 -- Sample campaign data
 TwitchDropsWatcher.Data.Campaigns = {
     {
+        name = "Patch 11.2 - Lil' Coalee",
+        reward = "Lil' Coalee",
+        requirement = "Watch 4 hours of WoW streams",
+        startDate = "2025-10-1 09:00 PDT",
+        endDate = "2025-10-29 09:00 PDT",
+        link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
+        icon = "Interface\\Icons\\inv_pitlordpet_black",
+        itemID = 257515, -- itemid for ctrl click
+        isActive = true,
+    },
+    {
         name = "Patch 11.1.7 - Adorned Half Shell",
         reward = "Adorned Half Shell",
         requirement = "Watch 4 hours of WoW streams",
@@ -14,7 +25,7 @@ TwitchDropsWatcher.Data.Campaigns = {
         link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
         icon = "Interface\\Icons\\inv_cape_special_turtleshell_c_03",
         itemID = 235987, -- itemid for ctrl click
-        isActive = true,
+        isActive = false,
     },
     {
         name = "11.2 - Shadefur Brewthief Pet",
@@ -25,7 +36,7 @@ TwitchDropsWatcher.Data.Campaigns = {
         link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
         icon = "Interface\\Icons\\inv_redpandapet_violet",
         itemID = 246451, -- itemid for ctrl click
-        isActive = true,
+        isActive = false,
     },
 }
 
