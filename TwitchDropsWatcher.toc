@@ -1,7 +1,7 @@
-## Interface: 110107, 110200
+## Interface: 110107, 110200, 110205
 ## Title: Twitch Drops Watcher
 ## Notes: Tracks Twitch Drops and promotions for World of Warcraft: The War Within.
-## Version: 11.2.1
+## Version: 11.2.5
 ## Author: Frost-Lightbringer
 ## Group: Tools by: Frostaphim | Frost-Lightbringer
 
