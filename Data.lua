@@ -6,6 +6,17 @@ TwitchDropsWatcher.Data = TwitchDropsWatcher.Data or {}
 -- Sample campaign data
 TwitchDropsWatcher.Data.Campaigns = {
     {
+        name = "Patch 11.2.7 - Topsy Turvy Joker's Mask transmog",
+        reward = "Topsy Turvy Joker's Mask transmog",
+        requirement = "Watch 4 hours of WoW streams",
+        startDate = "2025-12-2 10:00 PST",
+        endDate = "2025-12-30 10:00 PST",
+        link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
+        icon = "inv_helm_armor_darkmoonmask_c_01",
+        itemID = 235343, -- itemid for ctrl click
+        isActive = true,
+    },
+    {
         name = "Patch 11.2.5 - Violet Sweatsuit transmog",
         reward = "Violet Sweatsuit transmog",
         requirement = "Watch 4 hours of WoW streams",
@@ -14,7 +25,7 @@ TwitchDropsWatcher.Data.Campaigns = {
         link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
         icon = "Interface\\Icons\\inv_shirt_purple_01",
         itemID = 242480, -- itemid for ctrl click
-        isActive = true,
+        isActive = false,
     },
     {
         name = "Patch 11.2 - Lil' Coalee",

@@ -2,7 +2,7 @@
 
 ## Title: Twitch Drops Watcher
 ## Notes: Tracks Twitch Drops and promotions for World of Warcraft
-## Version: 11.7
+## Version: 11.7.1
 ## Author: Frost-Lightbringer
 
 ## IconTexture: Interface\ICONS\inv_eyeofnzothpet
