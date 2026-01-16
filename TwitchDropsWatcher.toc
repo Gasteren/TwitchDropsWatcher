@@ -2,7 +2,7 @@
 
 ## Title: Twitch Drops Watcher
 ## Notes: Tracks Twitch Drops and promotions for World of Warcraft
-## Version: 11.7.1
+## Version: 12.0.0
 ## Author: Frost-Lightbringer
 
 ## IconTexture: Interface\ICONS\inv_eyeofnzothpet
@@ -29,4 +29,5 @@ libs\LibSharedMedia-3.0\LibSharedMedia-3.0.lua
 Core.lua
 Data.lua
 UI.lua
+
 Settings.lua
