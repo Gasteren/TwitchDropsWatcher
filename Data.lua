@@ -6,6 +6,17 @@ TwitchDropsWatcher.Data = TwitchDropsWatcher.Data or {}
 -- Sample campaign data
 TwitchDropsWatcher.Data.Campaigns = {
     {
+        name = "Patch 12.0.0 - Cuddly Green Grrgle Decor",
+        reward = "Cuddly Green Grrgle Decor",
+        requirement = "Watch 4 hours of WoW streams",
+        startDate = "2026-01-20 10:00 PST",
+        endDate = "2026-02-17 10:00 PST",
+        link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
+        icon = "7496714", -- For some odd reason the icon is a number??
+        itemID = 263301, -- itemid for ctrl click
+        isActive = true,
+    },
+    {
         name = "Patch 11.2.7 - Topsy Turvy Joker's Mask transmog",
         reward = "Topsy Turvy Joker's Mask transmog",
         requirement = "Watch 4 hours of WoW streams",
@@ -14,7 +25,7 @@ TwitchDropsWatcher.Data.Campaigns = {
         link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
         icon = "inv_helm_armor_darkmoonmask_c_01",
         itemID = 235343, -- itemid for ctrl click
-        isActive = true,
+        isActive = false,
     },
     {
         name = "Patch 11.2.5 - Violet Sweatsuit transmog",
@@ -78,4 +89,5 @@ function TwitchDropsWatcher.Data:UpdateCampaignStatus()
         local endTime = self:ParseDate(campaign.endDate)
         campaign.isActive = currentTime >= startTime and currentTime <= endTime
     end
+
 end
