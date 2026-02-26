@@ -6,6 +6,17 @@ TwitchDropsWatcher.Data = TwitchDropsWatcher.Data or {}
 -- Sample campaign data
 TwitchDropsWatcher.Data.Campaigns = {
     {
+        name = "Patch 12.0.1 - Cuddly Alliance/Horde Grrgle Decor",
+        reward = "Cuddly Alliance/Horde Grrgle Decor",
+        requirement = "Watch 4 hours of WoW streams",
+        startDate = "2026-02-26 10:00 PST",
+        endDate = "2026-03-24 09:00 PST",
+        link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
+        icon = "7497419", -- For some odd reason the icon is a number??
+        itemID = 263298, -- itemid for ctrl click
+        isActive = true,
+    },
+    {
         name = "Patch 12.0.0 - Cuddly Green Grrgle Decor",
         reward = "Cuddly Green Grrgle Decor",
         requirement = "Watch 4 hours of WoW streams",
@@ -14,7 +25,7 @@ TwitchDropsWatcher.Data.Campaigns = {
         link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
         icon = "7496714", -- For some odd reason the icon is a number??
         itemID = 263301, -- itemid for ctrl click
-        isActive = true,
+        isActive = false,
     },
     {
         name = "Patch 11.2.7 - Topsy Turvy Joker's Mask transmog",
