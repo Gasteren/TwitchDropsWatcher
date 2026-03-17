@@ -1,5 +1,3 @@
-print("Loading TwitchDropsWatcher Core.lua") -- Debug print to confirm loading
-
 TwitchDropsWatcher = TwitchDropsWatcher or {}
 
 -- Initialize Ace3 addon and more
@@ -10,33 +8,19 @@ if not addon then
     return
 end
 
-local AceConfig = LibStub and LibStub("AceConfig-3.0", true)
-local AceConfigDialog = LibStub and LibStub("AceConfigDialog-3.0", true)
+local AceConfig       = nil -- removed, settings now handled natively
+local AceConfigDialog = nil -- removed, settings now handled natively
 
 -- Initialize addon
 function addon:OnInitialize()
-    print("TwitchDropsWatcher: OnInitialize called") -- Debug print
     -- Load saved variables
     TwitchDropsWatcherDB = TwitchDropsWatcherDB or {
         notifyOnLogin = true,
-        playSound = true,
-        autoOpenUI = false,
+        playSound     = true,
+        autoOpenUI    = false,
+        collectedDrops = {},
     }
-
-    -- Register settings with AceConfig
-    if AceConfig and AceConfigDialog and TwitchDropsWatcher.options and TwitchDropsWatcher.options.type == "group" and TwitchDropsWatcher.options.args then
-        if not AceConfigDialog.BlizOptions[addonName] then
-            local success, err = pcall(function()
-                AceConfig:RegisterOptionsTable(addonName, TwitchDropsWatcher.options)
-                AceConfigDialog:AddToBlizOptions(addonName, "Twitch Drops Watcher")
-            end)
-            if not success then
-                print("|cffFF0000TwitchDropsWatcher Error:|r Failed to register options: " .. tostring(err))
-            end
-        end
-    else
-        print("|cffFF0000TwitchDropsWatcher Warning:|r AceConfig, AceConfigDialog, or valid options table not found! Settings disabled.")
-    end
+    TwitchDropsWatcherDB.collectedDrops = TwitchDropsWatcherDB.collectedDrops or {}
 
     -- Update campaign status
     if TwitchDropsWatcher.Data and TwitchDropsWatcher.Data.UpdateCampaignStatus then
@@ -87,7 +71,7 @@ function addon:CheckForActiveCampaigns()
     local activeCampaigns = {}
     if TwitchDropsWatcher.Data and TwitchDropsWatcher.Data.Campaigns then
         for _, campaign in ipairs(TwitchDropsWatcher.Data.Campaigns) do
-            if campaign.isActive then
+            if campaign.isActive and not TwitchDropsWatcherDB.collectedDrops[campaign.name] then
                 table.insert(activeCampaigns, campaign)
             end
         end
@@ -111,4 +95,10 @@ end
 SLASH_TWITCHDROPSWATCHER1 = "/tdw"
 SlashCmdList["TWITCHDROPSWATCHER"] = function()
     TwitchDropsWatcher.UI:Toggle()
+end
+
+-- Slash command to open settings
+SLASH_TWITCHDROPSWATCH2 = "/tdws"
+SlashCmdList["TWITCHDROPSWATCH"] = function()
+    TwitchDropsWatcher.Settings:Toggle()
 end

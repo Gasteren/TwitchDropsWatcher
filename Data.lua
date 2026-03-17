@@ -1,5 +1,3 @@
-print("Loading TwitchDropsWatcher Data.lua") -- Debug print to confirm loading
-
 TwitchDropsWatcher = TwitchDropsWatcher or {}
 TwitchDropsWatcher.Data = TwitchDropsWatcher.Data or {}
 
