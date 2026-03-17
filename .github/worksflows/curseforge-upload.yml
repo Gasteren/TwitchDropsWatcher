@@ -22,7 +22,7 @@ jobs:
       - name: Upload to CurseForge
         uses: itsmeow/curseforge-upload@v3
         with:
-          token: "${{ secrets.ADIBAGS_FISHING }}"
+          token: "${{ secrets.TWITCHDROPSWATCHER }}"
           project_id: "1310016"
           game_endpoint: "wow"
           file_path: "TwitchDropsWatcher.zip"
