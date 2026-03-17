@@ -16,7 +16,7 @@ jobs:
         run: |
           mkdir TwitchDropsWatcher
           cp *.lua *.toc TwitchDropsWatcher/
-          cp -r images libs TwitchDropsWatcher/
+          cp -r images libs icons TwitchDropsWatcher/
           zip -r TwitchDropsWatcher.zip TwitchDropsWatcher
 
       - name: Upload to CurseForge
