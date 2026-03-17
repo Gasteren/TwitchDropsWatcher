@@ -8,9 +8,6 @@ if not addon then
     return
 end
 
-local AceConfig       = nil -- removed, settings now handled natively
-local AceConfigDialog = nil -- removed, settings now handled natively
-
 -- Initialize addon
 function addon:OnInitialize()
     -- Load saved variables
@@ -66,27 +63,35 @@ end
 
 -- Check for active campaigns and notify
 function addon:CheckForActiveCampaigns()
-    if not TwitchDropsWatcherDB.notifyOnLogin then return end
-
     local activeCampaigns = {}
+    local uncollectedCampaigns = {}
+
     if TwitchDropsWatcher.Data and TwitchDropsWatcher.Data.Campaigns then
         for _, campaign in ipairs(TwitchDropsWatcher.Data.Campaigns) do
-            if campaign.isActive and not TwitchDropsWatcherDB.collectedDrops[campaign.name] then
+            if campaign.isActive then
                 table.insert(activeCampaigns, campaign)
+                if not TwitchDropsWatcherDB.collectedDrops[campaign.name] then
+                    table.insert(uncollectedCampaigns, campaign)
+                end
             end
         end
     end
 
-    if #activeCampaigns > 0 then
+    -- Auto-open only if there are uncollected active campaigns
+    if TwitchDropsWatcherDB.autoOpenUI and #uncollectedCampaigns > 0 then
+        C_Timer.After(0, function()
+            TwitchDropsWatcher.UI:Show()
+        end)
+    end
+
+    -- Notifications only for uncollected campaigns
+    if TwitchDropsWatcherDB.notifyOnLogin and #uncollectedCampaigns > 0 then
         print("|cff00ff00Twitch Drops Watcher:|r Active Twitch Drop campaigns available!")
-        for _, campaign in ipairs(activeCampaigns) do
+        for _, campaign in ipairs(uncollectedCampaigns) do
             print(string.format("|cff00ff00%s:|r %s (%s - %s)", campaign.name, campaign.reward, campaign.startDate, campaign.endDate))
         end
         if TwitchDropsWatcherDB.playSound then
-            PlaySound(567429) -- Alert sound (e.g., "Raid Warning")
-        end
-        if TwitchDropsWatcherDB.autoOpenUI then
-            TwitchDropsWatcher.UI:Show()
+            PlaySound(567429)
         end
     end
 end

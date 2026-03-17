@@ -289,22 +289,22 @@ local function CreateCampaignCard(parent, campaign, index)
     timerText:SetText(FormatTimeRemaining(card.endTime - time()))
 
     -- ── "I have this drop" pill checkbox ──────────────────
-    local isCollected = TwitchDropsWatcherDB.collectedDrops[campaign.name] or false
+    local isCollected = TwitchDropsWatcherDB.collectedDrops[campaign.name] and true or false
 
     local checkPill = CreateFrame("Frame", nil, card)
-    checkPill:SetSize(148, 22)
-    checkPill:SetPoint("BOTTOMRIGHT", card, "BOTTOMRIGHT", -10, 10)
+    checkPill:SetSize(160, 26)
+    checkPill:SetPoint("BOTTOMRIGHT", card, "BOTTOMRIGHT", -10, 8)
     CreateBackground(checkPill, 0.18, 0.18, 0.18, 1)
     AddPixelBorder(checkPill, 0.30, 0.30, 0.30, 1, 1)
 
-    local checkbox = CreateFrame("CheckButton", nil, checkPill, "UICheckButtonTemplate")
-    checkbox:SetSize(18, 18)
-    checkbox:SetPoint("LEFT", checkPill, "LEFT", 4, 0)
+    local checkbox = CreateFrame("CheckButton", nil, card, "UICheckButtonTemplate")
+    checkbox:SetSize(24, 24)
+    checkbox:SetPoint("LEFT", checkPill, "LEFT", 2, 0)
     checkbox:SetChecked(isCollected)
     checkbox.campaign = campaign
 
     local checkLabel = checkPill:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    checkLabel:SetPoint("LEFT", checkbox, "RIGHT", 2, 0)
+    checkLabel:SetPoint("LEFT", checkPill, "LEFT", 28, 0)
     checkLabel:SetTextColor(0.65, 0.65, 0.65)
     checkLabel:SetText("I have this drop")
 
@@ -322,7 +322,7 @@ local function CreateCampaignCard(parent, campaign, index)
 
     checkbox:SetScript("OnClick", function(self)
         local name    = self.campaign.name
-        local checked = self:GetChecked()
+        local checked = self:GetChecked() and true or false
         TwitchDropsWatcherDB.collectedDrops[name] = checked or nil
         ApplyCollectedStyle(checked)
         if checked then
