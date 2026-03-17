@@ -1,9 +1,9 @@
 TwitchDropsWatcher = TwitchDropsWatcher or {}
 TwitchDropsWatcher.Settings = TwitchDropsWatcher.Settings or {}
 
--- ============================================================
+-- =============================================================
 -- Helpers (duplicated locally to keep Settings self-contained)
--- ============================================================
+-- =============================================================
 
 local function AddPixelBorder(frame, r, g, b, a, thickness)
     thickness = thickness or 1
