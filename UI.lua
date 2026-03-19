@@ -149,10 +149,94 @@ function TwitchDropsWatcher.UI:Create()
         end
     end)
 
+    -- ── Tab bar ──────────────────────────────────────────────
+    local tabBar = CreateFrame("Frame", nil, frame)
+    tabBar:SetHeight(30)
+    tabBar:SetPoint("BOTTOMLEFT",  frame, "BOTTOMLEFT",   2,  2)
+    tabBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -2,  0)
+    CreateBackground(tabBar, 0.10, 0.10, 0.10, 1)
+
+    local tabLine = tabBar:CreateTexture(nil, "OVERLAY")
+    tabLine:SetHeight(1)
+    tabLine:SetPoint("TOPLEFT",  tabBar, "TOPLEFT")
+    tabLine:SetPoint("TOPRIGHT", tabBar, "TOPRIGHT")
+    tabLine:SetColorTexture(0.20, 0.20, 0.20, 1)
+
+    frame.activeTab = "active"
+
+    local function CreateTab(label, tabKey, anchorPoint, anchorX)
+        local tab = CreateFrame("Button", nil, tabBar)
+        tab:SetSize(120, 30)
+        tab:SetPoint(anchorPoint, tabBar, anchorPoint, anchorX, 0)
+
+        local tabBg = tab:CreateTexture(nil, "BACKGROUND")
+        tabBg:SetAllPoints(tab)
+        tabBg:SetColorTexture(0, 0, 0, 0)
+        tab.bg = tabBg
+
+        local tabText = tab:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        tabText:SetAllPoints(tab)
+        tabText:SetJustifyH("CENTER")
+        tabText:SetJustifyV("MIDDLE")
+        tab.text = tabText
+
+        local tabUnderline = tab:CreateTexture(nil, "OVERLAY")
+        tabUnderline:SetHeight(2)
+        tabUnderline:SetPoint("BOTTOMLEFT",  tab, "BOTTOMLEFT")
+        tabUnderline:SetPoint("BOTTOMRIGHT", tab, "BOTTOMRIGHT")
+        tabUnderline:SetColorTexture(0.57, 0.27, 0.96, 0)
+        tab.underline = tabUnderline
+
+        tab:SetScript("OnEnter", function()
+            if frame.activeTab ~= tabKey then
+                tabBg:SetColorTexture(0.15, 0.15, 0.15, 1)
+            end
+        end)
+        tab:SetScript("OnLeave", function()
+            if frame.activeTab ~= tabKey then
+                tabBg:SetColorTexture(0, 0, 0, 0)
+            end
+        end)
+        tab:SetScript("OnClick", function()
+            frame.activeTab = tabKey
+            TwitchDropsWatcher.UI:Update()
+        end)
+
+        return tab
+    end
+
+    frame.tabActive    = CreateTab("Active",    "active",    "LEFT",  0)
+    frame.tabCompleted = CreateTab("Completed", "completed", "LEFT",  120)
+    frame.tabExpired   = CreateTab("Expired",   "expired",   "LEFT",  240)
+
+    local function RefreshTabs()
+        local tabs = {
+            {frame.tabActive,    "active"},
+            {frame.tabCompleted, "completed"},
+            {frame.tabExpired,   "expired"},
+        }
+        for _, pair in ipairs(tabs) do
+            local tab, key = pair[1], pair[2]
+            if frame.activeTab == key then
+                tab.bg:SetColorTexture(0.13, 0.13, 0.13, 1)
+                tab.text:SetTextColor(1, 1, 1)
+                tab.underline:SetColorTexture(0.57, 0.27, 0.96, 1)
+            else
+                tab.bg:SetColorTexture(0, 0, 0, 0)
+                tab.text:SetTextColor(0.55, 0.55, 0.60)
+                tab.underline:SetColorTexture(0.57, 0.27, 0.96, 0)
+            end
+        end
+    end
+    frame.tabActive.text:SetText("Active")
+    frame.tabCompleted.text:SetText("Completed")
+    frame.tabExpired.text:SetText("Expired")
+    frame.RefreshTabs = RefreshTabs
+
     -- ── Scroll area (no scrollbar, mousewheel only) ──────────
     local scrollFrame = CreateFrame("ScrollFrame", "TwitchDropsWatcherScroll", frame)
     scrollFrame:SetPoint("TOPLEFT",     frame, "TOPLEFT",     8, -48)
-    scrollFrame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -8,   8)
+    scrollFrame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -8,  34)
     scrollFrame:EnableMouseWheel(true)
     scrollFrame:SetScript("OnMouseWheel", function(self, delta)
         local current = self:GetVerticalScroll()
@@ -234,7 +318,7 @@ local function CreateCampaignCard(parent, campaign, index)
         end)
         iconBtn:SetScript("OnEnter", function(self)
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip:SetText("|cffaaaaааCtrl+Click|r to preview in Dressing Room", 1, 1, 1)
+            GameTooltip:SetText("Ctrl+Click to preview in Dressing Room", 1, 1, 1)
             GameTooltip:Show()
         end)
         iconBtn:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -247,7 +331,7 @@ local function CreateCampaignCard(parent, campaign, index)
     nameText:SetPoint("TOPLEFT", card, "TOPLEFT", textX, -10)
     nameText:SetWidth(235)
     nameText:SetJustifyH("LEFT")
-    nameText:SetTextColor(0.95, 0.95, 1.0)
+    nameText:SetTextColor(1.0, 0.95, 0.95) -- set by ApplyCollectedStyle or upcoming below
     nameText:SetText(campaign.name)
 
     local rewardLabel = card:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -275,21 +359,49 @@ local function CreateCampaignCard(parent, campaign, index)
     reqText:SetText(campaign.requirement)
 
     -- ── Right column: timer ────────────────────────────────
-    local endsLabel = card:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    endsLabel:SetPoint("TOPRIGHT", card, "TOPRIGHT", -10, -10)
-    endsLabel:SetJustifyH("RIGHT")
-    endsLabel:SetTextColor(0.57, 0.27, 0.96)
-    endsLabel:SetText("ENDS IN")
+    local isUpcoming = not campaign.isActive and campaign.isUpcoming
+    local isExpired  = campaign.isExpired and not campaign.isActive
+
+    local timerLabel = card:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    timerLabel:SetPoint("TOPRIGHT", card, "TOPRIGHT", -10, -10)
+    timerLabel:SetJustifyH("RIGHT")
+    timerLabel:SetTextColor(0.57, 0.27, 0.96)
+    if isExpired then
+        timerLabel:SetText("ENDED")
+    elseif isUpcoming then
+        timerLabel:SetText("STARTS IN")
+    else
+        timerLabel:SetText("ENDS IN")
+    end
 
     local timerText = card:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    timerText:SetPoint("TOPRIGHT", endsLabel, "BOTTOMRIGHT", 0, -3)
+    timerText:SetPoint("TOPRIGHT", timerLabel, "BOTTOMRIGHT", 0, -3)
     timerText:SetJustifyH("RIGHT")
-    card.timerText = timerText
-    card.endTime   = TwitchDropsWatcher.Data:ParseDate(campaign.endDate)
-    timerText:SetText(FormatTimeRemaining(card.endTime - time()))
+    card.timerText  = timerText
+    card.isUpcoming = isUpcoming
+    if isExpired then
+        timerText:SetText("|cff555555Expired|r")
+        card.endTime = nil
+    elseif isUpcoming then
+        card.endTime = TwitchDropsWatcher.Data:ParseDate(campaign.startDate)
+        timerText:SetText(FormatTimeRemaining(card.endTime - time()))
+    else
+        card.endTime = TwitchDropsWatcher.Data:ParseDate(campaign.endDate)
+        timerText:SetText(FormatTimeRemaining(card.endTime - time()))
+    end
 
     -- ── "I have this drop" pill checkbox ──────────────────
-    local isCollected = TwitchDropsWatcherDB.collectedDrops[campaign.name] and true or false
+    if isUpcoming then
+        -- Orange = coming soon
+        nameText:SetTextColor(1.0, 0.60, 0.10)
+        stripe:SetColorTexture(1.0, 0.60, 0.10, 1)
+        local soonLabel = card:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        soonLabel:SetPoint("BOTTOMRIGHT", card, "BOTTOMRIGHT", -10, 10)
+        soonLabel:SetJustifyH("RIGHT")
+        soonLabel:SetTextColor(1.0, 0.60, 0.10, 0.7)
+        soonLabel:SetText("Coming soon")
+    else
+        local isCollected = TwitchDropsWatcherDB.collectedDrops[campaign.name] and true or false
 
     local checkPill = CreateFrame("Frame", nil, card)
     checkPill:SetSize(160, 26)
@@ -308,14 +420,17 @@ local function CreateCampaignCard(parent, campaign, index)
     checkLabel:SetTextColor(0.65, 0.65, 0.65)
     checkLabel:SetText("I have this drop")
 
-    -- Visual feedback: dim card when collected
+    -- Expired: grey. Active: red = available, green = collected
     local function ApplyCollectedStyle(collected)
-        if collected then
-            nameText:SetTextColor(0.45, 0.45, 0.50)
-            stripe:SetColorTexture(0.25, 0.25, 0.28, 1)
+        if isExpired then
+            nameText:SetTextColor(0.50, 0.50, 0.50)
+            stripe:SetColorTexture(0.35, 0.35, 0.35, 1)
+        elseif collected then
+            nameText:SetTextColor(0.20, 0.85, 0.20)
+            stripe:SetColorTexture(0.20, 0.85, 0.20, 1)
         else
-            nameText:SetTextColor(0.95, 0.95, 1.0)
-            stripe:SetColorTexture(0.57, 0.27, 0.96, 1)
+            nameText:SetTextColor(1.0, 0.25, 0.25)
+            stripe:SetColorTexture(1.0, 0.25, 0.25, 1)
         end
     end
     ApplyCollectedStyle(isCollected)
@@ -325,10 +440,12 @@ local function CreateCampaignCard(parent, campaign, index)
         local checked = self:GetChecked() and true or false
         TwitchDropsWatcherDB.collectedDrops[name] = checked or nil
         ApplyCollectedStyle(checked)
+        -- Refresh the whole UI so active/expired/completed tabs stay in sync
+        TwitchDropsWatcher.UI:Update()
         if checked then
-            print(string.format("|cff9146ffTwitch Drops Watcher:|r Marked |cffffd700%s|r as collected. No more notifications.", name))
+            print(string.format("|cff9146ffTwitch Drops Watcher:|r Marked |cffffd700%s|r as collected.", name))
         else
-            print(string.format("|cff9146ffTwitch Drops Watcher:|r Unmarked |cffffd700%s|r. Notifications restored.", name))
+            print(string.format("|cff9146ffTwitch Drops Watcher:|r Unmarked |cffffd700%s|r.", name))
         end
     end)
 
@@ -340,6 +457,7 @@ local function CreateCampaignCard(parent, campaign, index)
         GameTooltip:Show()
     end)
     checkbox:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    end -- end if isUpcoming else
 
     return card
 end
@@ -355,37 +473,80 @@ function TwitchDropsWatcher.UI:Update()
 
     local content = self.frame.content
 
-    -- Clear existing children
     for _, child in ipairs({content:GetChildren()}) do
         child:Hide()
         child:SetParent(nil)
     end
 
-    -- Gather active campaigns
-    local activeCampaigns = {}
-    if TwitchDropsWatcher.Data and TwitchDropsWatcher.Data.Campaigns then
-        for _, campaign in ipairs(TwitchDropsWatcher.Data.Campaigns) do
-            if campaign.isActive then
-                table.insert(activeCampaigns, campaign)
-            end
-        end
+    if self.frame.RefreshTabs then
+        self.frame.RefreshTabs()
     end
 
-    -- Empty state
-    if #activeCampaigns == 0 then
+    local activeTab = self.frame.activeTab or "active"
+
+    -- ── Helper: empty state text ──
+    local function ShowEmpty(msg)
         content:SetHeight(80)
         local empty = content:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         empty:SetPoint("CENTER", content, "CENTER", 0, 0)
         empty:SetTextColor(0.5, 0.5, 0.6)
-        empty:SetText("No active Twitch Drop campaigns right now.")
-        return
+        empty:SetText(msg)
     end
 
-    for i, campaign in ipairs(activeCampaigns) do
-        CreateCampaignCard(content, campaign, i)
-    end
+    if activeTab == "completed" then
+        local list = {}
+        if TwitchDropsWatcher.Data and TwitchDropsWatcher.Data.Campaigns then
+            for _, campaign in ipairs(TwitchDropsWatcher.Data.Campaigns) do
+                if TwitchDropsWatcherDB.collectedDrops[campaign.name] and not campaign.isUpcoming then
+                    table.insert(list, campaign)
+                end
+            end
+        end
+        if #list == 0 then ShowEmpty("No completed drops yet.") return end
+        for i, campaign in ipairs(list) do CreateCampaignCard(content, campaign, i) end
+        content:SetHeight(#list * (CARD_H + CARD_PAD))
 
-    content:SetHeight(#activeCampaigns * (CARD_H + CARD_PAD))
+    elseif activeTab == "expired" then
+        local list = {}
+        if TwitchDropsWatcher.Data and TwitchDropsWatcher.Data.Campaigns then
+            for _, campaign in ipairs(TwitchDropsWatcher.Data.Campaigns) do
+                if campaign.isExpired and not TwitchDropsWatcherDB.collectedDrops[campaign.name] then
+                    table.insert(list, campaign)
+                end
+            end
+        end
+        if #list == 0 then ShowEmpty("No expired drops.") return end
+        for i, campaign in ipairs(list) do CreateCampaignCard(content, campaign, i) end
+        content:SetHeight(#list * (CARD_H + CARD_PAD))
+
+    else
+        -- Active tab: skip collected campaigns
+        local activeCampaigns   = {}
+        local upcomingCampaigns = {}
+        if TwitchDropsWatcher.Data and TwitchDropsWatcher.Data.Campaigns then
+            for _, campaign in ipairs(TwitchDropsWatcher.Data.Campaigns) do
+                if campaign.isActive and not TwitchDropsWatcherDB.collectedDrops[campaign.name] then
+                    table.insert(activeCampaigns, campaign)
+                elseif campaign.isUpcoming then
+                    table.insert(upcomingCampaigns, campaign)
+                end
+            end
+        end
+        if #activeCampaigns == 0 and #upcomingCampaigns == 0 then
+            ShowEmpty("No active Twitch Drop campaigns right now.")
+            return
+        end
+        local index = 1
+        for _, campaign in ipairs(activeCampaigns) do
+            CreateCampaignCard(content, campaign, index)
+            index = index + 1
+        end
+        for _, campaign in ipairs(upcomingCampaigns) do
+            CreateCampaignCard(content, campaign, index)
+            index = index + 1
+        end
+        content:SetHeight((index - 1) * (CARD_H + CARD_PAD))
+    end
 end
 
 -- ============================================================
