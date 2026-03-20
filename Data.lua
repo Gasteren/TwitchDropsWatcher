@@ -14,6 +14,7 @@ TwitchDropsWatcher.Data.Campaigns = {
         link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
         icon = "7537089",
         itemID = 265545,
+        rewardType = "decor",
     },
     {
         name = "Patch 12.0.1 - Decor Reward",
@@ -24,6 +25,7 @@ TwitchDropsWatcher.Data.Campaigns = {
         link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
         icon = "7497419",
         itemID = 263298,
+        rewardType = "decor",
     },
     {
         name = "Patch 12.0.0 - Decor Reward",
@@ -34,6 +36,7 @@ TwitchDropsWatcher.Data.Campaigns = {
         link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
         icon = "7496714",
         itemID = 263301,
+        rewardType = "decor",
     },
     {
         name = "Patch 11.2.7 - Transmog Reward",
@@ -44,6 +47,7 @@ TwitchDropsWatcher.Data.Campaigns = {
         link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
         icon = "6369206",
         itemID = 235343,
+        rewardType = "transmog",
     },
     {
         name = "Patch 11.2.5 - Transmog Reward",
@@ -54,6 +58,7 @@ TwitchDropsWatcher.Data.Campaigns = {
         link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
         icon = "Interface\\Icons\\inv_shirt_purple_01",
         itemID = 242480,
+        rewardType = "transmog",
     },
     {
         name = "Patch 11.2 - Pet Reward",
@@ -64,6 +69,7 @@ TwitchDropsWatcher.Data.Campaigns = {
         link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
         icon = "Interface\\Icons\\inv_pitlordpet_black",
         itemID = 257515,
+        rewardType = "pet",
     },
     {
         name = "Patch 11.1.7 - Transmog Reward",
@@ -74,6 +80,7 @@ TwitchDropsWatcher.Data.Campaigns = {
         link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
         icon = "Interface\\Icons\\inv_cape_special_turtleshell_c_03",
         itemID = 235987,
+        rewardType = "transmog",
     },
     {
         name = "11.2 - Pet Reward",
@@ -84,6 +91,7 @@ TwitchDropsWatcher.Data.Campaigns = {
         link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
         icon = "Interface\\Icons\\inv_redpandapet_violet",
         itemID = 246451,
+        rewardType = "pet",
     },
 }
 

@@ -35,7 +35,7 @@ function addon:OnInitialize()
     end
 
     -- Register events
-    self:RegisterEvent("PLAYER_LOGIN", "CheckForActiveCampaigns")
+    self:RegisterEvent("PLAYER_LOGIN", "OnPlayerLogin")
 end
 
 -- Create minimap button
@@ -61,7 +61,104 @@ function addon:CreateMinimapButton()
     end
 end
 
--- Check for active campaigns and notify
+-- Detect if the player already owns a campaign reward
+-- Returns true/false/nil (nil = unable to determine, e.g. data not cached yet)
+function TwitchDropsWatcher.CheckOwnership(campaign)
+    local itemID = campaign.itemID
+    if not itemID then return nil end
+
+    local rType = campaign.rewardType
+
+    if rType == "pet" then
+        if not C_PetJournal then return nil end
+        -- GetPetInfoByItemID returns speciesID as 13th return value
+        local speciesID = select(13, C_PetJournal.GetPetInfoByItemID(itemID))
+        if not speciesID then return nil end -- not cached yet, trigger retry
+        local numCollected = C_PetJournal.GetNumCollectedInfo(speciesID)
+        return numCollected and numCollected > 0
+
+    elseif rType == "toy" then
+        return PlayerHasToy and PlayerHasToy(itemID) or nil
+
+    elseif rType == "transmog" then
+        if not C_TransmogCollection then return nil end
+        -- PlayerHasTransmog is the correct single-call API
+        local hasTransmog = C_TransmogCollection.PlayerHasTransmog(itemID)
+        if hasTransmog == nil then return nil end -- not cached yet
+        return hasTransmog
+
+    elseif rType == "decor" then
+        if not C_TooltipInfo then return nil end
+        local tooltipData = C_TooltipInfo.GetItemByID(itemID)
+        if not tooltipData then return nil end
+        for _, line in ipairs(tooltipData.lines or {}) do
+            local text = line.leftText or ""
+            if text:find("Owned") or text:find("owned") then
+                local count = text:match("(%d+)")
+                return count and tonumber(count) > 0
+            end
+        end
+        return false
+    end
+
+    return nil
+end
+
+-- Auto-detect ownership for all campaigns and update collectedDrops
+function TwitchDropsWatcher.AutoDetectOwnership()
+    if not TwitchDropsWatcher.Data or not TwitchDropsWatcher.Data.Campaigns then return end
+
+    local detected = 0
+    local needsRetry = {}
+
+    for _, campaign in ipairs(TwitchDropsWatcher.Data.Campaigns) do
+        if not TwitchDropsWatcherDB.collectedDrops[campaign.name] then
+            local owned = TwitchDropsWatcher.CheckOwnership(campaign)
+            if owned == true then
+                TwitchDropsWatcherDB.collectedDrops[campaign.name] = true
+                detected = detected + 1
+            elseif owned == nil and campaign.itemID then
+                -- Inconclusive — item data not cached yet, queue a retry
+                table.insert(needsRetry, campaign)
+                if C_Item and C_Item.RequestLoadItemDataByID then
+                    C_Item.RequestLoadItemDataByID(campaign.itemID)
+                end
+            end
+        end
+    end
+
+    if detected > 0 then
+        print(string.format("|cff9146ffTwitch Drops Watcher:|r Auto-detected |cffffd700%d|r owned reward(s) and marked them as collected.", detected))
+        TwitchDropsWatcher.UI:Update()
+    end
+
+    -- Retry inconclusive items after 3 seconds once item data has had time to cache
+    if #needsRetry > 0 then
+        C_Timer.After(3, function()
+            local retryDetected = 0
+            for _, campaign in ipairs(needsRetry) do
+                if not TwitchDropsWatcherDB.collectedDrops[campaign.name] then
+                    local owned = TwitchDropsWatcher.CheckOwnership(campaign)
+                    if owned == true then
+                        TwitchDropsWatcherDB.collectedDrops[campaign.name] = true
+                        retryDetected = retryDetected + 1
+                    end
+                end
+            end
+            if retryDetected > 0 then
+                print(string.format("|cff9146ffTwitch Drops Watcher:|r Auto-detected |cffffd700%d|r more owned reward(s) after cache load.", retryDetected))
+                TwitchDropsWatcher.UI:Update()
+            end
+        end)
+    end
+end
+
+-- On login: auto-detect ownership then check for notifications
+function addon:OnPlayerLogin()
+    TwitchDropsWatcher.AutoDetectOwnership()
+    addon:CheckForActiveCampaigns()
+end
+
 function addon:CheckForActiveCampaigns()
     local activeCampaigns = {}
     local uncollectedCampaigns = {}
@@ -77,7 +174,6 @@ function addon:CheckForActiveCampaigns()
         end
     end
 
-    -- Auto-open only if there are uncollected active campaigns
     if TwitchDropsWatcherDB.autoOpenUI and #uncollectedCampaigns > 0 then
         C_Timer.After(0, function()
             TwitchDropsWatcher.UI:Show()
@@ -106,4 +202,12 @@ end
 SLASH_TWITCHDROPSWATCH2 = "/tdws"
 SlashCmdList["TWITCHDROPSWATCH"] = function()
     TwitchDropsWatcher.Settings:Toggle()
+end
+
+-- Slash command to manually re-run ownership detection
+SLASH_TWITCHDROPSCHECK1 = "/tdwcheck"
+SlashCmdList["TWITCHDROPSCHECK"] = function()
+    TwitchDropsWatcher.AutoDetectOwnership()
+    TwitchDropsWatcher.UI:Update()
+    print("|cff9146ffTwitch Drops Watcher:|r Ownership check complete.")
 end

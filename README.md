@@ -1,19 +1,26 @@
-# 🟣 Twitch Drops Watcher (World of Warcraft Addon)
+# Twitch Drops Watcher
 
-**Twitch Drops Watcher** is a lightweight World of Warcraft addon that helps you track active Twitch Drop campaigns directly in-game. Easily check current rewards, requirements, and campaign duration without leaving Azeroth.
-
----
-
-## 📦 Features
-
-- 🔔 **In-game UI** showing all **active Twitch Drops** campaigns.
-- ⏱️ **Live countdowns** for each campaign's end time.
-- 🎁 Displays **reward details**, requirements, and campaign icons.
-- 🧭 Compact movable frame UI, integrated into WoW's style.
+Tracks active Twitch Drop campaigns directly in-game, no more alt-tabbing to check what's available or whether you've already claimed a reward.
 
 ---
 
-## 📸 Preview
+## Features
+
+- Live countdown timers per campaign (ends in / starts in)
+- Reward details, requirements, and icons per campaign
+- Ctrl+Click the reward icon to preview it in the Dressing Room
+- **Three tabs** — Active, Completed, and Expired
+- **Automatic ownership detection** — on login the addon checks your pets, transmogs, and housing decor and marks any rewards you already own as collected
+- **"I have this drop"** checkbox to manually mark rewards as collected
+- Collected drops are hidden from Active and no longer trigger notifications
+- Expired drops remain visible so you can retroactively mark ones you claimed
+- Upcoming campaigns shown in the Active tab with a "Starts In" countdown
+- Login notifications with optional sound alert
+- Auto-open on login if there are uncollected active campaigns
+
+---
+
+## Preview
 
 ![Twitch Drops Watcher Preview](https://raw.githubusercontent.com/Gasteren/TwitchDropsWatcher/master/images/main.png)
 ![Options Menu](https://raw.githubusercontent.com/Gasteren/TwitchDropsWatcher/master/images/options.png)
@@ -21,6 +28,24 @@
 
 ---
 
-## 🛠️ How to Install
+## Install
 
-Download from [Curseforge](https://Curseforge.com/wow/addons/twitch-drops-watcher)
+Download from [CurseForge](https://www.curseforge.com/wow/addons/twitch-drops-watcher)
+
+---
+
+## Commands
+
+| Command | Action |
+|---------|--------|
+| `/tdw` | Open/close the main window |
+| `/tdws` | Open/close settings |
+| `/tdwcheck` | Manually re-run ownership detection |
+
+---
+
+## Ownership Detection
+
+On every login the addon automatically checks whether you already own each reward and marks it as collected if you do. This works for pets, transmog appearances, toys, and housing decor.
+
+If a reward isn't being detected correctly, for example if the item data hadn't finished loading when the check ran — use `/tdwcheck` to manually trigger a re-scan at any time. You can also always tick the **"I have this drop"** checkbox on any card yourself.
