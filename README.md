@@ -20,6 +20,16 @@ Tracks active Twitch Drop campaigns directly in-game, no more alt-tabbing to che
 
 ---
 
+## Commands
+
+| Command | Action |
+|---------|--------|
+| `/tdw` | Open/close the main window |
+| `/tdws` | Open/close settings |
+| `/tdwcheck` | Manually re-run ownership detection |
+
+---
+
 ## Preview
 
 ![Twitch Drops Watcher Preview](https://raw.githubusercontent.com/Gasteren/TwitchDropsWatcher/master/images/main.png)
@@ -31,18 +41,6 @@ Tracks active Twitch Drop campaigns directly in-game, no more alt-tabbing to che
 ## Install
 
 Download from [CurseForge](https://www.curseforge.com/wow/addons/twitch-drops-watcher)
-
----
-
-## Commands
-
-| Command | Action |
-|---------|--------|
-| `/tdw` | Open/close the main window |
-| `/tdws` | Open/close settings |
-| `/tdwcheck` | Manually re-run ownership detection |
-
----
 
 ## Ownership Detection
 

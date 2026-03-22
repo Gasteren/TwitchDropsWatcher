@@ -4,6 +4,8 @@ TwitchDropsWatcher.Data = TwitchDropsWatcher.Data or {}
 -- All dates are in UTC. Use 24-hour format: "YYYY-MM-DD HH:MM"
 -- Conversion tip: PDT = UTC-7, PST = UTC-8
 -- e.g. 03:00 PDT = 10:00 UTC, 10:00 PST = 18:00 UTC
+
+-- Decor, transmog, ensemble, pet
 TwitchDropsWatcher.Data.Campaigns = {
     {
         name = "Patch 12.0.1 - Decor Reward",
@@ -58,7 +60,8 @@ TwitchDropsWatcher.Data.Campaigns = {
         link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
         icon = "Interface\\Icons\\inv_shirt_purple_01",
         itemID = 242480,
-        rewardType = "transmog",
+        rewardType = "ensemble",
+        appearanceItemID = 242421, -- Violet Sweatshirt (chest piece from the ensemble)
     },
     {
         name = "Patch 11.2 - Pet Reward",

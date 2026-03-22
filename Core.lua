@@ -80,11 +80,12 @@ function TwitchDropsWatcher.CheckOwnership(campaign)
     elseif rType == "toy" then
         return PlayerHasToy and PlayerHasToy(itemID) or nil
 
-    elseif rType == "transmog" then
+    elseif rType == "transmog" or rType == "ensemble" then
         if not C_TransmogCollection then return nil end
-        -- PlayerHasTransmog is the correct single-call API
-        local hasTransmog = C_TransmogCollection.PlayerHasTransmog(itemID)
-        if hasTransmog == nil then return nil end -- not cached yet
+        -- For ensembles, the original itemID is consumed on use — check the appearance piece instead
+        local checkID = (rType == "ensemble" and campaign.appearanceItemID) or itemID
+        local hasTransmog = C_TransmogCollection.PlayerHasTransmog(checkID)
+        if hasTransmog == nil then return nil end
         return hasTransmog
 
     elseif rType == "decor" then
