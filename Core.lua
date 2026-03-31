@@ -80,23 +80,29 @@ function TwitchDropsWatcher.CheckOwnership(campaign)
     elseif rType == "toy" then
         return PlayerHasToy and PlayerHasToy(itemID) or nil
 
-    elseif rType == "transmog" or rType == "ensemble" then
+    elseif rType == "transmog" then
         if not C_TransmogCollection then return nil end
-        -- For ensembles, the original itemID is consumed on use — check the appearance piece instead
-        local checkID = (rType == "ensemble" and campaign.appearanceItemID) or itemID
-        local hasTransmog = C_TransmogCollection.PlayerHasTransmog(checkID)
-        if hasTransmog == nil then return nil end
+        -- PlayerHasTransmog is the correct single-call API
+        local hasTransmog = C_TransmogCollection.PlayerHasTransmog(itemID)
+        if hasTransmog == nil then return nil end -- not cached yet
         return hasTransmog
 
     elseif rType == "decor" then
-        if not C_TooltipInfo then return nil end
-        local tooltipData = C_TooltipInfo.GetItemByID(itemID)
-        if not tooltipData then return nil end
-        for _, line in ipairs(tooltipData.lines or {}) do
-            local text = line.leftText or ""
-            if text:find("Owned") or text:find("owned") then
-                local count = text:match("(%d+)")
-                return count and tonumber(count) > 0
+        -- Check bags + bank + warband/house chest for the item
+        -- GetItemCount(id, includeBank, includeCharges, includeReagentBank)
+        local count = GetItemCount(itemID, true)
+        if count and count > 0 then return true end
+        -- Also try C_TooltipInfo as a secondary check for items already placed/used
+        if C_TooltipInfo then
+            local tooltipData = C_TooltipInfo.GetItemByID(itemID)
+            if tooltipData then
+                for _, line in ipairs(tooltipData.lines or {}) do
+                    local text = line.leftText or ""
+                    if text:find("Owned") or text:find("owned") then
+                        local n = text:match("(%d+)")
+                        if n and tonumber(n) > 0 then return true end
+                    end
+                end
             end
         end
         return false
