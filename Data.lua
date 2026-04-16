@@ -8,6 +8,17 @@ TwitchDropsWatcher.Data = TwitchDropsWatcher.Data or {}
 -- Decor, transmog, ensemble, pet
 TwitchDropsWatcher.Data.Campaigns = {
     {
+        name = "Patch 12.0.5 - Decor Reward",
+        reward = "Cuddly Pearl Grrgle",
+        requirement = "Watch 4 hours of WoW streams",
+        startDate = "2026-04-23 15:00",
+        endDate = "2026-05-21 15:00",
+        link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
+        icon = "7531451",
+        itemID = 265394,
+        rewardType = "decor",
+    },
+    {
         name = "Patch 12.0.1 - Decor Reward",
         reward = "Cuddly Void Grrgle",
         requirement = "Watch 4 hours of WoW streams",
