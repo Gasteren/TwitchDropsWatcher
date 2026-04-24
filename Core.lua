@@ -35,7 +35,13 @@ function addon:OnInitialize()
     end
 
     -- Register events
-    self:RegisterEvent("PLAYER_LOGIN", "OnPlayerLogin")
+    self:RegisterEvent("PLAYER_LOGIN",          "OnPlayerLogin")
+    self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnPlayerEnteringWorld")
+    -- Fire instantly when rewards are actually learned or received
+    self:RegisterEvent("PET_JOURNAL_LIST_UPDATE",               "OnCollectionChanged")
+    self:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED",      "OnCollectionChanged")
+    self:RegisterEvent("MAIL_INBOX_UPDATE",                     "OnCollectionChanged")
+    self:RegisterEvent("HOUSING_DECORATION_COLLECTION_UPDATED", "OnCollectionChanged")
 end
 
 -- Create minimap button
@@ -88,21 +94,34 @@ function TwitchDropsWatcher.CheckOwnership(campaign)
         return hasTransmog
 
     elseif rType == "decor" then
-        -- Check bags + bank + warband/house chest for the item
-        -- GetItemCount(id, includeBank, includeCharges, includeReagentBank)
+        -- First check bags + bank in case item hasn't been stored yet
         local count = GetItemCount(itemID, true)
         if count and count > 0 then return true end
-        -- Also try C_TooltipInfo as a secondary check for items already placed/used
-        if C_TooltipInfo then
-            local tooltipData = C_TooltipInfo.GetItemByID(itemID)
-            if tooltipData then
-                for _, line in ipairs(tooltipData.lines or {}) do
-                    local text = line.leftText or ""
-                    if text:find("Owned") or text:find("owned") then
-                        local n = text:match("(%d+)")
-                        if n and tonumber(n) > 0 then return true end
-                    end
-                end
+
+        -- Use Blizzard's HOUSING_DECOR_OWNED_COUNT_FORMAT global to build a
+        -- localized pattern — works in all client languages even after item
+        -- is placed in the house chest (tooltip still shows owned count)
+        if not C_TooltipInfo then return nil end
+        local tooltipData = C_TooltipInfo.GetItemByID(itemID)
+        if not tooltipData then return nil end
+
+        local pattern
+        if _G.HOUSING_DECOR_OWNED_COUNT_FORMAT then
+            pattern = _G.HOUSING_DECOR_OWNED_COUNT_FORMAT
+                :gsub("([%(%)%[%]%.%+%-%*%?%^%$%%])", "%%%1")
+                :gsub("%%d", "(%%d+)")
+        end
+
+        for _, line in ipairs(tooltipData.lines or {}) do
+            local text = line.leftText or ""
+            if pattern then
+                local n = text:match(pattern)
+                if n and tonumber(n) > 0 then return true end
+            end
+            -- Fallback plain text for safety
+            if text:find("Owned") or text:find("owned") then
+                local n = text:match("(%d+)")
+                if n and tonumber(n) > 0 then return true end
             end
         end
         return false
@@ -161,9 +180,31 @@ function TwitchDropsWatcher.AutoDetectOwnership()
 end
 
 -- On login: auto-detect ownership then check for notifications
+-- Also schedule a 10s safety net scan in case item data wasn't cached immediately
 function addon:OnPlayerLogin()
     TwitchDropsWatcher.AutoDetectOwnership()
     addon:CheckForActiveCampaigns()
+    C_Timer.After(10, function()
+        TwitchDropsWatcher.AutoDetectOwnership()
+    end)
+end
+
+-- On /reload: re-run ownership scan only, no notifications
+function addon:OnPlayerEnteringWorld(isInitialLogin)
+    if isInitialLogin then return end
+    TwitchDropsWatcher.AutoDetectOwnership()
+end
+
+-- Fires when a pet, transmog, housing decor, or mail changes
+-- Throttled to avoid running multiple times from rapid successive events
+local collectionScanPending = false
+function addon:OnCollectionChanged()
+    if collectionScanPending then return end
+    collectionScanPending = true
+    C_Timer.After(1, function()
+        collectionScanPending = false
+        TwitchDropsWatcher.AutoDetectOwnership()
+    end)
 end
 
 function addon:CheckForActiveCampaigns()
