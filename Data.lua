@@ -72,7 +72,7 @@ TwitchDropsWatcher.Data.Campaigns = {
         icon = "Interface\\Icons\\inv_shirt_purple_01",
         itemID = 242480,
         rewardType = "ensemble",
-        appearanceItemID = 242421, -- Violet Sweatshirt (chest piece from the ensemble)
+        appearanceItemIDs = { 242421, 242450 }, -- Violet Sweatshirt (chest), Violet Sweatpants (legs)
     },
     {
         name = "Patch 11.2 - Pet Reward",
