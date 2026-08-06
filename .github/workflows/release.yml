@@ -29,6 +29,6 @@ jobs:
           file_path: "TwitchDropsWatcher.zip"
           game_versions: "12.1.0"
           release_type: "release"
-          display_name: "TwitchDropsWatcher - ${{ github.event.head_commit.timestamp }}"
-          changelog: "${{ github.event.head_commit.message }}"
+          display_name: "TwitchDropsWatcher - ${{ github.event.head_commit.timestamp || github.sha }}"
+          changelog: "${{ github.event.head_commit.message || 'Manual release' }}"
           changelog_type: "markdown"
