@@ -8,6 +8,17 @@ TwitchDropsWatcher.Data = TwitchDropsWatcher.Data or {}
 -- Decor, transmog, ensemble, pet
 TwitchDropsWatcher.Data.Campaigns = {
     {
+        name = "Patch 12.0.7 - Transmog Reward",
+        reward = "Sorcerer's Grassy Garb",
+        requirement = "Watch 4 hours of WoW streams",
+        startDate = "2026-08-11 17:00",
+        endDate = "2026-09-8 17:00",
+        link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
+        icon = "7291736",
+        itemID = 257974,
+        rewardType = "transmog",
+    },
+    {
         name = "Patch 12.0.7 - Decor Reward",
         reward = "Cuddly Cotton Candy Grrgle",
         requirement = "Watch 4 hours of WoW streams",
