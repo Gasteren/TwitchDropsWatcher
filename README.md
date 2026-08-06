@@ -9,7 +9,6 @@ Tracks active Twitch Drop campaigns directly in-game, no more alt-tabbing to che
 - Live countdown timers per campaign (ends in / starts in)
 - Reward details, requirements, and icons per campaign
 - Ctrl+Click the reward icon to preview it in the Dressing Room
-- **Three tabs** — Active, Completed, and Expired
 - **Automatic ownership detection** — on login the addon checks your pets, transmogs, and housing decor and marks any rewards you already own as collected
 - **"I have this drop"** checkbox to manually mark rewards as collected
 - Collected drops are hidden from Active and no longer trigger notifications
