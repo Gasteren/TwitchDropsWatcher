@@ -16,7 +16,8 @@ TwitchDropsWatcher.Data.Campaigns = {
         link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
         icon = "7291736",
         itemID = 257974,
-        rewardType = "transmog",
+        rewardType = "ensemble",
+        appearanceItemIDs = { 257762, 257782 }, -- Sorcerer's Grassy Cowl & Sorcerer's Grassy Cape
     },
     {
         name = "Patch 12.0.7 - Decor Reward",
