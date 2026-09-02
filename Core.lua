@@ -35,7 +35,17 @@ function addon:OnInitialize()
     end
 
     -- Register events
-    self:RegisterEvent("PLAYER_LOGIN", "OnPlayerLogin")
+    self:RegisterEvent("PLAYER_LOGIN",          "OnPlayerLogin")
+    -- Also fires on /reload, where PLAYER_LOGIN does not
+    self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnPlayerEnteringWorld")
+    -- Fire as soon as a reward is actually learned or received
+    self:RegisterEvent("PET_JOURNAL_LIST_UPDATE",               "OnCollectionChanged")
+    self:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED",      "OnCollectionChanged")
+    self:RegisterEvent("NEW_MOUNT_ADDED",                       "OnCollectionChanged")
+    self:RegisterEvent("NEW_TOY_ADDED",                         "OnCollectionChanged")
+    self:RegisterEvent("TOYS_UPDATED",                          "OnCollectionChanged")
+    self:RegisterEvent("MAIL_INBOX_UPDATE",                     "OnCollectionChanged")
+    self:RegisterEvent("HOUSING_DECORATION_COLLECTION_UPDATED", "OnCollectionChanged")
 end
 
 -- Create minimap button
@@ -78,7 +88,18 @@ function TwitchDropsWatcher.CheckOwnership(campaign)
         return numCollected and numCollected > 0
 
     elseif rType == "toy" then
-        return PlayerHasToy and PlayerHasToy(itemID) or nil
+        if not PlayerHasToy then return nil end
+        return PlayerHasToy(itemID) and true or false
+
+    elseif rType == "mount" then
+        if not C_MountJournal then return nil end
+        -- Item teaches a mount; resolve the mountID first
+        local mountID = C_MountJournal.GetMountFromItem(itemID)
+        if not mountID then return nil end -- not cached yet, trigger retry
+        -- isCollected is the 11th return of GetMountInfoByID
+        local isCollected = select(11, C_MountJournal.GetMountInfoByID(mountID))
+        if isCollected == nil then return nil end
+        return isCollected and true or false
 
     elseif rType == "transmog" or rType == "ensemble" then
         if not C_TransmogCollection then return nil end
@@ -100,21 +121,34 @@ function TwitchDropsWatcher.CheckOwnership(campaign)
         return false
 
     elseif rType == "decor" then
-        -- Check bags + bank + warband/house chest for the item
-        -- GetItemCount(id, includeBank, includeCharges, includeReagentBank)
+        -- Still in bags or bank means owned but not yet placed
         local count = GetItemCount(itemID, true)
         if count and count > 0 then return true end
-        -- Also try C_TooltipInfo as a secondary check for items already placed/used
-        if C_TooltipInfo then
-            local tooltipData = C_TooltipInfo.GetItemByID(itemID)
-            if tooltipData then
-                for _, line in ipairs(tooltipData.lines or {}) do
-                    local text = line.leftText or ""
-                    if text:find("Owned") or text:find("owned") then
-                        local n = text:match("(%d+)")
-                        if n and tonumber(n) > 0 then return true end
-                    end
-                end
+
+        -- Once placed in the house chest the item leaves your inventory, but the
+        -- tooltip still shows an owned count. Build the match pattern from
+        -- Blizzard's own format string so this works in every client locale.
+        if not C_TooltipInfo then return nil end
+        local tooltipData = C_TooltipInfo.GetItemByID(itemID)
+        if not tooltipData then return nil end
+
+        local pattern
+        if _G.HOUSING_DECOR_OWNED_COUNT_FORMAT then
+            pattern = _G.HOUSING_DECOR_OWNED_COUNT_FORMAT
+                :gsub("([%(%)%[%]%.%+%-%*%?%^%$%%])", "%%%1")
+                :gsub("%%d", "(%%d+)")
+        end
+
+        for _, line in ipairs(tooltipData.lines or {}) do
+            local text = line.leftText or ""
+            if pattern then
+                local n = text:match(pattern)
+                if n and tonumber(n) > 0 then return true end
+            end
+            -- Fallback for English clients if the global is missing
+            if text:find("Owned") or text:find("owned") then
+                local n = text:match("(%d+)")
+                if n and tonumber(n) > 0 then return true end
             end
         end
         return false
@@ -173,9 +207,31 @@ function TwitchDropsWatcher.AutoDetectOwnership()
 end
 
 -- On login: auto-detect ownership then check for notifications
+-- The delayed rescan catches items whose data had not cached on the first pass
 function addon:OnPlayerLogin()
     TwitchDropsWatcher.AutoDetectOwnership()
     addon:CheckForActiveCampaigns()
+    C_Timer.After(10, function()
+        TwitchDropsWatcher.AutoDetectOwnership()
+    end)
+end
+
+-- Fires on /reload as well as login; skip the login case since OnPlayerLogin covers it
+function addon:OnPlayerEnteringWorld(isInitialLogin)
+    if isInitialLogin then return end
+    TwitchDropsWatcher.AutoDetectOwnership()
+end
+
+-- A pet, mount, toy, transmog, decor or mail change happened.
+-- These events often fire several times in a row, so debounce for 1 second.
+local collectionScanPending = false
+function addon:OnCollectionChanged()
+    if collectionScanPending then return end
+    collectionScanPending = true
+    C_Timer.After(1, function()
+        collectionScanPending = false
+        TwitchDropsWatcher.AutoDetectOwnership()
+    end)
 end
 
 function addon:CheckForActiveCampaigns()

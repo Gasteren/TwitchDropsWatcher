@@ -5,8 +5,42 @@ TwitchDropsWatcher.Data = TwitchDropsWatcher.Data or {}
 -- Conversion tip: PDT = UTC-7, PST = UTC-8
 -- e.g. 03:00 PDT = 10:00 UTC, 10:00 PST = 18:00 UTC
 
--- Decor, transmog, ensemble, pet
+-- rewardType: decor, transmog, ensemble, pet, mount, toy
+-- ensemble also needs appearanceItemIDs = { id1, id2 } (the pieces it teaches)
 TwitchDropsWatcher.Data.Campaigns = {
+    {
+        name = "BlizzCon 2026 - Decor Reward",
+        reward = "Cuddly Blue Grrgle",
+        requirement = "Watch 4 hours of BlizzCon 2026",
+        startDate = "2026-09-12 18:30",
+        endDate = "2026-09-27 19:00",
+        link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
+        icon = "7497415",
+        itemID = 263303,
+        rewardType = "decor",
+    },
+    {
+        name = "BlizzCon 2026 - Mount Reward",
+        reward = "Fluffy Comfy Flying Quilt",
+        requirement = "Watch 8 hours of BlizzCon 2026",
+        startDate = "2026-09-12 18:30",
+        endDate = "2026-09-27 19:00",
+        link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
+        icon = "Interface\\Icons\\inv_flyingcarpetmount4",
+        itemID = 263449,
+        rewardType = "mount",
+    },
+    {
+        name = "BlizzCon 2026 - Toy Reward",
+        reward = "Venomous Champion's Illustrious Banner",
+        requirement = "Watch 12 hours of BlizzCon 2026",
+        startDate = "2026-09-12 18:30",
+        endDate = "2026-09-27 19:00",
+        link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
+        icon = "Interface\\Icons\\inv_12xp_mdi_awv_banner02",
+        itemID = 279590,
+        rewardType = "toy",
+    },
     {
         name = "Patch 12.1.0 - Transmog Reward",
         reward = "Sorcerer's Grassy Garb",
