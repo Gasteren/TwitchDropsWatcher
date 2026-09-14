@@ -34,18 +34,26 @@ function addon:OnInitialize()
         print("|cffFF0000TwitchDropsWatcher Error:|r LibDataBroker-1.1 not found! Minimap button disabled.")
     end
 
-    -- Register events
+    -- Register events.
+    -- Optional collection events vary between game versions, so register them
+    -- defensively: an event this client doesn't know is skipped, not fatal.
     self:RegisterEvent("PLAYER_LOGIN",          "OnPlayerLogin")
     -- Also fires on /reload, where PLAYER_LOGIN does not
     self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnPlayerEnteringWorld")
-    -- Fire as soon as a reward is actually learned or received
-    self:RegisterEvent("PET_JOURNAL_LIST_UPDATE",               "OnCollectionChanged")
-    self:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED",      "OnCollectionChanged")
-    self:RegisterEvent("NEW_MOUNT_ADDED",                       "OnCollectionChanged")
-    self:RegisterEvent("NEW_TOY_ADDED",                         "OnCollectionChanged")
-    self:RegisterEvent("TOYS_UPDATED",                          "OnCollectionChanged")
-    self:RegisterEvent("MAIL_INBOX_UPDATE",                     "OnCollectionChanged")
-    self:RegisterEvent("HOUSING_DECORATION_COLLECTION_UPDATED", "OnCollectionChanged")
+
+    local optionalEvents = {
+        "PET_JOURNAL_LIST_UPDATE",          -- pets
+        "TRANSMOG_COLLECTION_SOURCE_ADDED", -- transmog and ensembles
+        "NEW_MOUNT_ADDED",                  -- mounts
+        "NEW_TOY_ADDED",                    -- toys
+        "TOYS_UPDATED",                     -- toys (older clients)
+        "MAIL_INBOX_UPDATE",                -- drops arriving by mail
+    }
+    for _, event in ipairs(optionalEvents) do
+        pcall(function()
+            self:RegisterEvent(event, "OnCollectionChanged")
+        end)
+    end
 end
 
 -- Create minimap button
