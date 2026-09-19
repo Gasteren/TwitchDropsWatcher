@@ -496,7 +496,7 @@ function TwitchDropsWatcher.UI:Update()
     if activeTab == "completed" then
         local list = {}
         if TwitchDropsWatcher.Data and TwitchDropsWatcher.Data.Campaigns then
-            for _, campaign in ipairs(TwitchDropsWatcher.Data.Campaigns) do
+            for _, campaign in ipairs(TwitchDropsWatcher.Data:GetCampaigns()) do
                 if TwitchDropsWatcherDB.collectedDrops[campaign.name] and not campaign.isUpcoming then
                     table.insert(list, campaign)
                 end
@@ -509,7 +509,7 @@ function TwitchDropsWatcher.UI:Update()
     elseif activeTab == "expired" then
         local list = {}
         if TwitchDropsWatcher.Data and TwitchDropsWatcher.Data.Campaigns then
-            for _, campaign in ipairs(TwitchDropsWatcher.Data.Campaigns) do
+            for _, campaign in ipairs(TwitchDropsWatcher.Data:GetCampaigns()) do
                 if campaign.isExpired and not TwitchDropsWatcherDB.collectedDrops[campaign.name] then
                     table.insert(list, campaign)
                 end
@@ -524,7 +524,7 @@ function TwitchDropsWatcher.UI:Update()
         local activeCampaigns   = {}
         local upcomingCampaigns = {}
         if TwitchDropsWatcher.Data and TwitchDropsWatcher.Data.Campaigns then
-            for _, campaign in ipairs(TwitchDropsWatcher.Data.Campaigns) do
+            for _, campaign in ipairs(TwitchDropsWatcher.Data:GetCampaigns()) do
                 if campaign.isActive and not TwitchDropsWatcherDB.collectedDrops[campaign.name] then
                     table.insert(activeCampaigns, campaign)
                 elseif campaign.isUpcoming then

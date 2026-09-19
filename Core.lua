@@ -179,7 +179,7 @@ function TwitchDropsWatcher.AutoDetectOwnership()
     local detected = 0
     local needsRetry = {}
 
-    for _, campaign in ipairs(TwitchDropsWatcher.Data.Campaigns) do
+    for _, campaign in ipairs(TwitchDropsWatcher.Data:GetCampaigns()) do
         if not TwitchDropsWatcherDB.collectedDrops[campaign.name] then
             local owned = TwitchDropsWatcher.CheckOwnership(campaign)
             if owned == true then
@@ -254,7 +254,7 @@ function addon:CheckForActiveCampaigns()
     local uncollectedCampaigns = {}
 
     if TwitchDropsWatcher.Data and TwitchDropsWatcher.Data.Campaigns then
-        for _, campaign in ipairs(TwitchDropsWatcher.Data.Campaigns) do
+        for _, campaign in ipairs(TwitchDropsWatcher.Data:GetCampaigns()) do
             if campaign.isActive then
                 table.insert(activeCampaigns, campaign)
                 if not TwitchDropsWatcherDB.collectedDrops[campaign.name] then
@@ -300,4 +300,14 @@ SlashCmdList["TWITCHDROPSCHECK"] = function()
     TwitchDropsWatcher.AutoDetectOwnership()
     TwitchDropsWatcher.UI:Update()
     print("|cff9146ffTwitch Drops Watcher:|r Ownership check complete.")
+end
+-- Slash command to report the detected client flavor
+SLASH_TWITCHDROPSFLAVOR1 = "/tdwflavor"
+SlashCmdList["TWITCHDROPSFLAVOR"] = function()
+    local flavor, iv = TwitchDropsWatcher.Data:GetClientFlavor()
+    local shown = #TwitchDropsWatcher.Data:GetCampaigns()
+    local total = #TwitchDropsWatcher.Data.Campaigns
+    print(string.format(
+        "|cff9146ffTwitch Drops Watcher:|r client flavor |cffffd700%s|r (interface %s), showing |cffffd700%d|r of %d campaigns.",
+        flavor, tostring(iv or "unknown"), shown, total))
 end
