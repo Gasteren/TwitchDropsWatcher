@@ -88,7 +88,8 @@ function TwitchDropsWatcher.CheckOwnership(campaign)
     local rType = campaign.rewardType
 
     if rType == "pet" then
-        if not C_PetJournal then return nil end
+        if not (C_PetJournal and C_PetJournal.GetPetInfoByItemID
+                and C_PetJournal.GetNumCollectedInfo) then return nil end
         -- GetPetInfoByItemID returns speciesID as 13th return value
         local speciesID = select(13, C_PetJournal.GetPetInfoByItemID(itemID))
         if not speciesID then return nil end -- not cached yet, trigger retry
@@ -96,11 +97,14 @@ function TwitchDropsWatcher.CheckOwnership(campaign)
         return numCollected and numCollected > 0
 
     elseif rType == "toy" then
-        if not PlayerHasToy then return nil end
-        return PlayerHasToy(itemID) and true or false
+        -- PlayerHasToy may also move into C_ToyBox on newer clients
+        local hasToy = _G.PlayerHasToy or (C_ToyBox and C_ToyBox.PlayerHasToy)
+        if not hasToy then return nil end
+        return hasToy(itemID) and true or false
 
     elseif rType == "mount" then
-        if not C_MountJournal then return nil end
+        if not (C_MountJournal and C_MountJournal.GetMountFromItem
+                and C_MountJournal.GetMountInfoByID) then return nil end
         -- Item teaches a mount; resolve the mountID first
         local mountID = C_MountJournal.GetMountFromItem(itemID)
         if not mountID then return nil end -- not cached yet, trigger retry
@@ -110,7 +114,7 @@ function TwitchDropsWatcher.CheckOwnership(campaign)
         return isCollected and true or false
 
     elseif rType == "transmog" or rType == "ensemble" then
-        if not C_TransmogCollection then return nil end
+        if not (C_TransmogCollection and C_TransmogCollection.PlayerHasTransmog) then return nil end
         -- For ensembles the original itemID is consumed on use — check appearance pieces instead
         -- appearanceItemIDs is a table; any one matching = owned. Single appearanceItemID also supported.
         local checkIDs
@@ -129,14 +133,17 @@ function TwitchDropsWatcher.CheckOwnership(campaign)
         return false
 
     elseif rType == "decor" then
-        -- Still in bags or bank means owned but not yet placed
-        local count = GetItemCount(itemID, true)
+        -- Still in bags or bank means owned but not yet placed.
+        -- GetItemCount moved into the C_Item namespace; the old global is gone
+        -- in newer clients, so resolve whichever this client provides.
+        local getCount = (C_Item and C_Item.GetItemCount) or _G.GetItemCount
+        local count = getCount and getCount(itemID, true)
         if count and count > 0 then return true end
 
         -- Once placed in the house chest the item leaves your inventory, but the
         -- tooltip still shows an owned count. Build the match pattern from
         -- Blizzard's own format string so this works in every client locale.
-        if not C_TooltipInfo then return nil end
+        if not (C_TooltipInfo and C_TooltipInfo.GetItemByID) then return nil end
         local tooltipData = C_TooltipInfo.GetItemByID(itemID)
         if not tooltipData then return nil end
 
