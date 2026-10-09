@@ -13,6 +13,18 @@ TwitchDropsWatcher.Data = TwitchDropsWatcher.Data or {}
 -- Run /tdwflavor in game to see what the current client reports.
 TwitchDropsWatcher.Data.Campaigns = {
     {
+        name = "Patch 12.1.0 - Decor Reward",
+        reward = "Cuddly Gold-Colored Grrgle",
+        requirement = "Watch 4 hours of WoW streams",
+        startDate = "2026-10-13 17:00",
+        endDate = "2026-11-03 18:00",
+        link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
+        icon = "7496716",
+        itemID = 263294,
+        rewardType = "decor",
+        flavors = { "retail" },
+    },
+    {
         name = "BlizzCon 2026 - Decor Reward",
         reward = "Cuddly Blue Grrgle",
         requirement = "Watch 4 hours of BlizzCon 2026",
