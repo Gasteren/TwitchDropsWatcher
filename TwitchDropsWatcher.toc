@@ -1,8 +1,8 @@
-## Interface: 120007, 120100, 16001
+## Interface: 120007, 120100, 120105, 10601
 
 ## Title: Twitch Drops Watcher
 ## Notes: Tracks Twitch Drops and promotions for World of Warcraft
-## Version: 12.1.0
+## Version: 12.1.5
 ## Author: Frost-Lightbringer
 ## X-Curse-Project-ID: 1310016
 
