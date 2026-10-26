@@ -2,7 +2,7 @@
 
 ## Title: Twitch Drops Watcher
 ## Notes: Tracks Twitch Drops and promotions for World of Warcraft
-## Version: 12.1.5
+## Version: 1.0.0
 ## Author: Frost-Lightbringer
 ## X-Curse-Project-ID: 1310016
 
