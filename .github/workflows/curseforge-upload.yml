@@ -21,7 +21,7 @@ jobs:
           zip -r TwitchDropsWatcher.zip TwitchDropsWatcher
 
       - name: Upload to CurseForge
-        uses: itsmeow/curseforge-upload@v3
+        uses: itsmeow/curseforge-upload@13f278adc4cc7b881555f87e6ea528387dd6492b # v3 (v3.1.0)
         with:
           token: "${{ secrets.TWITCHDROPSWATCHER }}"
           project_id: "1310016"
