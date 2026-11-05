@@ -13,6 +13,18 @@ TwitchDropsWatcher.Data = TwitchDropsWatcher.Data or {}
 -- Run /tdwflavor in game to see what the current client reports.
 TwitchDropsWatcher.Data.Campaigns = {
     {
+        name = "Forever Launch - Toy Reward",
+        reward = "Pouch of Violet Dust",
+        requirement = "Watch 4 hours of WoW streams",
+        startDate = "2026-11-05 00:30",
+        endDate = "2026-11-13 00:30",
+        link = "https://www.twitch.tv/directory/game/World%20of%20Warcraft",
+        icon = "5931149",
+        itemID = 289439,
+        rewardType = "toy",
+        flavors = { "forever" },
+    },
+    {
         name = "Patch 12.1.0 - Decor Reward",
         reward = "Cuddly Gold-Colored Grrgle",
         requirement = "Watch 4 hours of WoW streams",
@@ -204,11 +216,11 @@ TwitchDropsWatcher.Data.Campaigns = {
 -- A campaign with no `flavors` field is shown on every client.
 
 -- Interface number bands. GetBuildInfo's 4th return is the interface version,
--- e.g. 120100 on retail Midnight, 10601 on WoW Forever.
+-- e.g. 120100 on retail Midnight, 16001 on WoW Forever (1.60.1), 11509 on Classic Era (1.15.9).
 local FLAVOR_RANGES = {
     { min = 100000, max = 999999, flavor = "retail"  },
-    { min =  10500, max =  10999, flavor = "forever" },
-    { min =  11000, max =  19999, flavor = "classic" },
+    { min =  16000, max =  19999, flavor = "forever" },
+    { min =  11000, max =  15999, flavor = "classic" },
 }
 
 function TwitchDropsWatcher.Data:GetInterfaceVersion()
